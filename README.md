@@ -98,22 +98,8 @@ If you're looking to harden your new or existing Ubuntu server, you're in the ri
 └── README.md
 ```
 
----
-
-## 🔒 Security Best Practices Included
-
-The Ansible hardening playbook includes:
-- SSH configuration
-- Password policy enforcement
-- User privilege adjustments
-- Basic firewall setup
-- Unnecessary service removal
-
-Feel free to customize the playbook according to your needs.
-
----
 
 ## 📬 Feedback
 
-go through my medium blog for more detailed info
+Go through my medium blog for more detailed info
 https://parth-raj.medium.com/ubuntu-server-hardening-guide-automated-with-ansible-aws-cloud-formation-c0f7570998e7
