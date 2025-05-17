@@ -1,0 +1,28 @@
+---
+- name: Apply Ubuntu Server Hardening
+  hosts: ubuntu_servers
+  become: yes
+  tasks:
+    - name: Remove unwanted users
+      script: scripts/unwanted-users.sh
+
+    - name: Lock packages
+      script: scripts/package-lock.sh
+
+    - name: Version hardening
+      script: scripts/version-hardening.sh
+
+    - name: GRUB configuration
+      script: scripts/grub.sh
+
+    - name: Disable USB storage
+      script: scripts/disable-usb.sh
+
+    - name: Filesystem hardening
+      script: scripts/filesystem.sh
+
+    - name: Secure libraries and packages
+      script: scripts/packages-lib.sh
+
+    - name: Apply password policy
+      script: scripts/password-policy.sh

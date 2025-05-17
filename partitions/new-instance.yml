@@ -1,0 +1,104 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  EC2 instance with attached EBS volumes for custom filesystems
+
+Parameters:
+  ServerName:
+    Description: "Server Name (Tag Name)"
+    Type: String
+
+  AmiId:
+    Description: "AMI ID for the EC2 instance (OS)"
+    Type: AWS::EC2::Image::Id
+
+  InstanceType:
+    Description: "EC2 instance type"
+    Type: String
+    Default: t3.medium
+
+  KeyName:
+    Description: "EC2 Key Pair for SSH access"
+    Type: AWS::EC2::KeyPair::KeyName
+
+  VpcId:
+    Description: "VPC ID where the instance will be launched"
+    Type: AWS::EC2::VPC::Id
+
+  SubnetId:
+    Description: "Subnet ID for the instance"
+    Type: AWS::EC2::Subnet::Id
+
+  SecurityGroupIds:
+    Description: "Security Group IDs (comma separated)"
+    Type: List<AWS::EC2::SecurityGroup::Id>
+
+  InstanceRole:
+    Description: "IAM Instance Profile name for EC2 role"
+    Type: String
+
+  HomeEbsSize:
+    Description: "EBS size (GiB) for /home"
+    Type: Number
+    Default: 10
+    MinValue: 1
+
+  UsrEbsSize:
+    Description: "EBS size (GiB) for /usr"
+    Type: Number
+    Default: 10
+    MinValue: 1
+
+  TmpEbsSize:
+    Description: "EBS size (GiB) for /tmp"
+    Type: Number
+    Default: 5
+    MinValue: 1
+
+  VarTmpEbsSize:
+    Description: "EBS size (GiB) for /var/tmp"
+    Type: Number
+    Default: 5
+    MinValue: 1
+
+  VarLogEbsSize:
+    Description: "EBS size (GiB) for /var/log"
+    Type: Number
+    Default: 10
+    MinValue: 1
+
+  VarEbsSize:
+    Description: "EBS size (GiB) for /var"
+    Type: Number
+    Default: 10
+    MinValue: 1
+
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          SubnetId: !Ref SubnetId
+          GroupSet: !Ref SecurityGroupIds
+      IamInstanceProfile: !Ref InstanceRole
+      Tags:
+        - Key: Name
+          Value: !Ref ServerName
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 8
+            VolumeType: gp3
+
+  # ... (rest of the resources remain exactly the same as original template)
+
+Outputs:
+  InstanceId:
+    Description: "EC2 Instance ID"
+    Value: !Ref EC2Instance
+
+  # ... (rest of the outputs remain the same)

@@ -1,0 +1,156 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Attach EBS volumes to an existing EC2 Ubuntu instance
+
+Parameters:
+  InstanceId:
+    Description: "ID of the existing EC2 Ubuntu instance"
+    Type: String
+
+  AvailabilityZone:
+    Description: "Availability Zone of the instance (e.g., us-east-1a)"
+    Type: AWS::EC2::AvailabilityZone::Name
+
+  HomeEbsSize:
+    Description: "Size in GiB for /home"
+    Type: Number
+    Default: 10
+    MinValue: 1
+
+  UsrEbsSize:
+    Description: "Size in GiB for /usr"
+    Type: Number
+    Default: 10
+    MinValue: 1
+
+  TmpEbsSize:
+    Description: "Size in GiB for /tmp"
+    Type: Number
+    Default: 5
+    MinValue: 1
+
+  VarTmpEbsSize:
+    Description: "Size in GiB for /var/tmp"
+    Type: Number
+    Default: 5
+    MinValue: 1
+
+  VarLogEbsSize:
+    Description: "Size in GiB for /var/log"
+    Type: Number
+    Default: 10
+    MinValue: 1
+
+  VarEbsSize:
+    Description: "Size in GiB for /var"
+    Type: Number
+    Default: 10
+    MinValue: 1
+
+Resources:
+
+  HomeVolume:
+    Type: AWS::EC2::Volume
+    Properties:
+      Size: !Ref HomeEbsSize
+      AvailabilityZone: !Ref AvailabilityZone
+      VolumeType: gp3
+      Tags:
+        - Key: Name
+          Value: Home
+
+  UsrVolume:
+    Type: AWS::EC2::Volume
+    Properties:
+      Size: !Ref UsrEbsSize
+      AvailabilityZone: !Ref AvailabilityZone
+      VolumeType: gp3
+      Tags:
+        - Key: Name
+          Value: Usr
+
+  TmpVolume:
+    Type: AWS::EC2::Volume
+    Properties:
+      Size: !Ref TmpEbsSize
+      AvailabilityZone: !Ref AvailabilityZone
+      VolumeType: gp3
+      Tags:
+        - Key: Name
+          Value: Tmp
+
+  VarTmpVolume:
+    Type: AWS::EC2::Volume
+    Properties:
+      Size: !Ref VarTmpEbsSize
+      AvailabilityZone: !Ref AvailabilityZone
+      VolumeType: gp3
+      Tags:
+        - Key: Name
+          Value: VarTmp
+
+  VarLogVolume:
+    Type: AWS::EC2::Volume
+    Properties:
+      Size: !Ref VarLogEbsSize
+      AvailabilityZone: !Ref AvailabilityZone
+      VolumeType: gp3
+      Tags:
+        - Key: Name
+          Value: VarLog
+
+  VarVolume:
+    Type: AWS::EC2::Volume
+    Properties:
+      Size: !Ref VarEbsSize
+      AvailabilityZone: !Ref AvailabilityZone
+      VolumeType: gp3
+      Tags:
+        - Key: Name
+          Value: Var
+
+  AttachHome:
+    Type: AWS::EC2::VolumeAttachment
+    Properties:
+      Device: /dev/xvdf
+      InstanceId: !Ref InstanceId
+      VolumeId: !Ref HomeVolume
+
+  AttachUsr:
+    Type: AWS::EC2::VolumeAttachment
+    Properties:
+      Device: /dev/xvdg
+      InstanceId: !Ref InstanceId
+      VolumeId: !Ref UsrVolume
+
+  AttachTmp:
+    Type: AWS::EC2::VolumeAttachment
+    Properties:
+      Device: /dev/xvdh
+      InstanceId: !Ref InstanceId
+      VolumeId: !Ref TmpVolume
+
+  AttachVarTmp:
+    Type: AWS::EC2::VolumeAttachment
+    Properties:
+      Device: /dev/xvdi
+      InstanceId: !Ref InstanceId
+      VolumeId: !Ref VarTmpVolume
+
+  AttachVarLog:
+    Type: AWS::EC2::VolumeAttachment
+    Properties:
+      Device: /dev/xvdj
+      InstanceId: !Ref InstanceId
+      VolumeId: !Ref VarLogVolume
+
+  AttachVar:
+    Type: AWS::EC2::VolumeAttachment
+    Properties:
+      Device: /dev/xvdk
+      InstanceId: !Ref InstanceId
+      VolumeId: !Ref VarVolume
+
+Outputs:
+  AttachedVolumes:
+    Description: "All EBS Volumes attached to the existing instance"
+    Value: !Join [ ", ", [ !Ref HomeVolume, !Ref UsrVolume, !Ref TmpVolume, !Ref VarTmpVolume, !Ref VarLogVolume, !Ref VarVolume ] ]
