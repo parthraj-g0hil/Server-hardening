@@ -101,5 +101,6 @@ If you're looking to harden your new or existing Ubuntu server, you're in the ri
 
 ## 📬 Feedback
 
-Go through my medium blog for more detailed info
-https://parth-raj.medium.com/ubuntu-server-hardening-guide-automated-with-ansible-aws-cloud-formation-c0f7570998e7
+Go through my medium blog for more detailed info \
+Blog -> https://parth-raj.medium.com/ubuntu-server-hardening-guide-automated-with-ansible-aws-cloud-formation-c0f7570998e7 \
+Linkedin -> https://www.linkedin.com/in/parthrajgohil/
