@@ -26,3 +26,6 @@
 
     - name: Apply password policy
       script: scripts/password-policy.sh
+
+    - name: set ulimit 
+      script: scripts/ulimit.sh
