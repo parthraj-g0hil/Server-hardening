@@ -7,7 +7,6 @@ scripts = [
     "apparmor.sh",
     "disable-usb.sh",
     "filesystem.py",
-    "filesystem.sh",
     "firewall.sh",
     "grub.sh",
     "package-lock.sh",
