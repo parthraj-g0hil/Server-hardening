@@ -44,7 +44,6 @@ declare -A USED_DISKS
 
 # Assign disks to mount points
 for dir in "${!MOUNTS[@]}"; do
-  # Check if already on a separate disk (not on root)
   existing_dev=$(findmnt -nr -o SOURCE --target "$dir" 2>/dev/null || true)
   existing_dev_blk=$(lsblk -no PKNAME "$existing_dev" 2>/dev/null || true)
 
@@ -60,7 +59,6 @@ for dir in "${!MOUNTS[@]}"; do
     dev=$(echo "$entry" | awk '{print $1}')
     dev_size=$(echo "$entry" | awk '{print $2}')
 
-    # Fix here: use :- to avoid unbound variable error under set -u
     if [[ "$dev_size" -ge "$required_size" && -z "${USED_DISKS[$dev]:-}" ]]; then
       selected_dev="$dev"
       USED_DISKS["$dev"]=1
@@ -78,13 +76,13 @@ done
 # Set up each selected mount point
 for dir in "${!DEVICE_MAP[@]}"; do
   device="${DEVICE_MAP[$dir]}"
-  label_name=$(basename "$dir" | tr -d '/')
+  label_name=$(echo "$dir" | sed 's|/|_|g; s|^_||')
   temp_mount="/mnt/$label_name"
   mount_opts="${MOUNT_OPTIONS[$dir]:-defaults}"
 
   echo "📁 Setting up $dir on $device (label: $label_name)"
 
-  # Format disk if unformatted
+  # Format if needed
   if ! blkid "$device" >/dev/null 2>&1; then
     echo "🌀 Formatting $device as ext4"
     mkfs.ext4 -L "$label_name" "$device"
@@ -103,8 +101,12 @@ for dir in "${!DEVICE_MAP[@]}"; do
   mkdir -p "$dir"
   mount -o "$mount_opts" "$device" "$dir"
 
-  grep -q "LABEL=$label_name" /etc/fstab || echo "LABEL=$label_name $dir ext4 $mount_opts 0 2" >> /etc/fstab
+  uuid=$(blkid -s UUID -o value "$device")
+  if ! grep -q "UUID=$uuid" /etc/fstab; then
+    echo "UUID=$uuid $dir ext4 $mount_opts 0 2" >> /etc/fstab
+  fi
 done
 
 echo "✅ Disk setup complete."
 echo "🔁 Reboot recommended to fully apply all persistent mounts."
+
